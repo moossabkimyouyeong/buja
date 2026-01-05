@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부자 키우기 RPG</title>
+    <title>부자 키우기 RPG - 시크릿 에디션</title>
     <style>
-        /* 디자인 설정 */
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .game-container { max-width: 450px; width: 100%; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid #2ecc71; }
         
@@ -13,11 +12,9 @@
         .money-display { font-size: 2.5rem; font-weight: bold; color: #2c3e50; text-align: center; margin: 10px 0; }
         .stat-info { font-size: 1rem; color: #7f8c8d; text-align: center; margin-bottom: 20px; }
 
-        /* 메인 클릭 버튼 */
-        #main-click-btn { width: 100%; height: 120px; border: none; border-radius: 15px; background: #2ecc71; color: white; font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: all 0.1s; box-shadow: 0 6px #27ae60; margin-bottom: 25px; outline: none; }
+        #main-click-btn { width: 100%; height: 120px; border: none; border-radius: 15px; background: #2ecc71; color: white; font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: all 0.1s; box-shadow: 0 6px #27ae60; margin-bottom: 25px; }
         #main-click-btn:active { transform: translateY(4px); box-shadow: 0 2px #27ae60; }
 
-        /* 섹션 스타일 */
         .section-title { font-size: 1.1rem; font-weight: bold; margin: 15px 0 10px; border-left: 4px solid #2ecc71; padding-left: 10px; }
         .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
@@ -26,182 +23,181 @@
         button.action-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; }
         .price { display: block; font-size: 0.8rem; color: #e67e22; margin-top: 5px; }
 
-        /* 로그창 */
+        /* 자동 클릭 버튼 스타일 */
+        #auto-toggle-btn { width: 100%; padding: 15px; margin-top: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; display: none; }
+        .auto-on { background-color: #e74c3c; color: white; }
+        .auto-off { background-color: #3498db; color: white; }
+
         #log { height: 50px; margin-top: 20px; padding: 12px; background: #f9f9f9; border-radius: 8px; font-size: 0.85rem; color: #555; border: 1px inset #eee; display: flex; align-items: center; justify-content: center; text-align: center; }
 
-        /* 후원 및 관리 버튼 */
-        .footer-buttons { margin-top: 20px; display: flex; gap: 10px; width: 100%; }
-        .reset-btn { flex: 1; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .secret-area { margin-top: 15px; text-align: right; }
+        .secret-btn { background: none; border: none; color: #bdc3c7; cursor: pointer; font-size: 0.8rem; }
 
-        /* 후원 계좌 섹션 */
         .donation-box { margin-top: 25px; padding: 15px; background: #fff9e6; border-radius: 12px; border: 1px solid #f1c40f; width: 100%; max-width: 450px; box-sizing: border-box; text-align: center; }
-        .donation-title { font-weight: bold; color: #d35400; font-size: 0.95rem; margin-bottom: 5px; }
         .donation-info { font-size: 0.9rem; color: #444; line-height: 1.6; }
     </style>
 </head>
 <body>
 
     <div class="game-container">
-        <div class="header">
-            <h1>💰 부자 키우기</h1>
-        </div>
-        
+        <div class="header"><h1>💰 부자 키우기</h1></div>
         <div class="money-display">₩ <span id="money">0</span></div>
         <div class="stat-info">현재 클릭당 숙련도: <span id="power">1</span></div>
 
         <button id="main-click-btn" onclick="earnMoney()">돈 벌기 (클릭!)</button>
 
-        <div class="section-title">🏢 상점 (확정 강화)</div>
+        <button id="auto-toggle-btn" onclick="toggleAutoClick()" class="auto-off">자동 클릭: OFF</button>
+
+        <div class="section-title">🏢 상점</div>
         <div class="grid-buttons">
-            <button class="action-btn" id="btn-upgrade" onclick="buyUpgrade()">
-                클릭 강화 (+1)
-                <span class="price" id="price-upgrade">비용: 100</span>
-            </button>
-            <button class="action-btn" id="btn-office" onclick="buyOffice()">
-                전문가 고용 (+10)
-                <span class="price" id="price-office">비용: 1,500</span>
-            </button>
+            <button class="action-btn" id="btn-upgrade" onclick="buyUpgrade()">클릭 강화 (+1)<span class="price" id="price-upgrade">비용: 100</span></button>
+            <button class="action-btn" id="btn-office" onclick="buyOffice()">전문가 고용 (+10)<span class="price" id="price-office">비용: 1,500</span></button>
         </div>
 
-        <div class="section-title">🎲 행운 (확률 뽑기)</div>
+        <div class="section-title">🎲 행운</div>
         <div class="grid-buttons">
-            <button class="action-btn" id="btn-gacha" onclick="playGacha()">
-                장비 뽑기
-                <span class="price">비용: 500</span>
-            </button>
-            <button class="reset-btn" onclick="resetGame()">초기화</button>
+            <button class="action-btn" onclick="playGacha()">장비 뽑기<span class="price">비용: 500</span></button>
+            <button class="action-btn" onclick="resetGame()">초기화</button>
         </div>
 
-        <div id="log">환영합니다! 클릭해서 돈을 벌어보세요.</div>
+        <div id="log">환영합니다!</div>
+
+        <div class="secret-area">
+            <button class="secret-btn" onclick="checkSecretCode()">[코드 입력]</button>
+        </div>
     </div>
 
     <div class="donation-box">
-        <div class="donation-title">☕ 개발자 후원하기</div>
+        <div style="font-weight:bold; color:#d35400;">☕ 개발자 후원하기</div>
         <div class="donation-info">
-            <strong>KB국민은행</strong> <br>
-            계좌번호: <strong>604490-74-445627</strong> <br>
-            예금주: <strong>임종혁</strong>
+            <strong>KB국민은행</strong> 604490-74-445627 (예금주: 임종혁)
         </div>
     </div>
 
     <script>
-        // 초기 데이터 세팅
         let state = {
             money: 0,
             power: 1,
             upgradeCost: 100,
             officeCost: 1500,
-            gachaCost: 500
+            isAutoUnlocked: false,
+            isAutoOn: false
         };
 
-        // 로컬스토리지 키 이름
-        const SAVE_KEY = "rich_rpg_data";
+        const SAVE_KEY = "rich_rpg_v2";
+        let autoInterval = null;
 
-        // [함수] 게임 데이터 저장
-        function saveGame() {
-            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        // [핵심] 코드 확인 기능
+        function checkSecretCode() {
+            const code = prompt("비밀 코드를 입력하세요.");
+            if (code === "moossam") {
+                state.isAutoUnlocked = true;
+                addLog("✨ 관리자 권한 승인: 자동 클릭이 해제되었습니다!");
+                updateUI();
+                saveGame();
+            } else {
+                alert("코드가 틀렸습니다.");
+            }
         }
 
-        // [함수] 게임 데이터 불러오기
-        function loadGame() {
-            const savedData = localStorage.getItem(SAVE_KEY);
-            if (savedData) {
-                state = JSON.parse(savedData);
-                addLog("성공적으로 데이터를 불러왔습니다.");
+        // [핵심] 자동 클릭 토글
+        function toggleAutoClick() {
+            state.isAutoOn = !state.isAutoOn;
+            if (state.isAutoOn) {
+                addLog("▶ 자동 클릭 시작!");
+                startAutoClick();
+            } else {
+                addLog("⏹ 자동 클릭 정지.");
+                stopAutoClick();
             }
             updateUI();
+            saveGame();
         }
 
-        // [함수] 게임 초기화
-        function resetGame() {
-            if (confirm("정말로 모든 데이터를 삭제하고 초기화하시겠습니까?")) {
-                localStorage.removeItem(SAVE_KEY);
-                location.reload();
-            }
+        function startAutoClick() {
+            if (autoInterval) clearInterval(autoInterval);
+            autoInterval = setInterval(() => {
+                earnMoney();
+            }, 100); // 0.1초마다 클릭 (매우 빠름)
         }
 
-        // [함수] 돈 벌기 (클릭)
+        function stopAutoClick() {
+            clearInterval(autoInterval);
+            autoInterval = null;
+        }
+
         function earnMoney() {
             state.money += state.power;
             updateUI();
-            saveGame(); // 클릭 시마다 자동 저장
         }
 
-        // [기능] 클릭 강화
         function buyUpgrade() {
             if (state.money >= state.upgradeCost) {
                 state.money -= state.upgradeCost;
                 state.power += 1;
                 state.upgradeCost = Math.floor(state.upgradeCost * 1.6);
-                addLog("강화 성공! 숙련도가 증가했습니다.");
                 updateUI();
                 saveGame();
             }
         }
 
-        // [기능] 전문가 고용
         function buyOffice() {
             if (state.money >= state.officeCost) {
                 state.money -= state.officeCost;
                 state.power += 10;
                 state.officeCost = Math.floor(state.officeCost * 1.8);
-                addLog("전문가 고용! 클릭 파워가 대폭 상승합니다.");
                 updateUI();
                 saveGame();
             }
         }
 
-        // [기능] 확률형 뽑기
         function playGacha() {
-            if (state.money >= state.gachaCost) {
-                state.money -= state.gachaCost;
-                
+            if (state.money >= 500) {
+                state.money -= 500;
                 const rand = Math.random() * 100;
-                let gain = 0;
-                let msg = "";
-
-                if (rand > 96) { // 4% 확률
-                    gain = 70;
-                    msg = "✨ [전설] 황금 마우스 획득! (파워 +70)";
-                } else if (rand > 75) { // 21% 확률
-                    gain = 20;
-                    msg = "💎 [희귀] 기계식 키보드 획득! (파워 +20)";
-                } else if (rand > 40) { // 35% 확률
-                    gain = 5;
-                    msg = "🛠️ [일반] 쓸만한 패드 획득. (파워 +5)";
-                } else {
-                    msg = "💨 꽝! 다음 기회에...";
-                }
-
+                let gain = rand > 90 ? 50 : (rand > 50 ? 10 : 0);
                 state.power += gain;
-                addLog(msg);
+                addLog(gain > 0 ? `뽑기 성공! 파워 +${gain}` : "꽝입니다.");
                 updateUI();
                 saveGame();
             }
         }
 
-        // [UI] 화면 갱신
         function updateUI() {
             document.getElementById('money').innerText = state.money.toLocaleString();
             document.getElementById('power').innerText = state.power.toLocaleString();
             document.getElementById('price-upgrade').innerText = `비용: ${state.upgradeCost.toLocaleString()}`;
             document.getElementById('price-office').innerText = `비용: ${state.officeCost.toLocaleString()}`;
 
-            // 버튼 활성화 체크
-            document.getElementById('btn-upgrade').disabled = (state.money < state.upgradeCost);
-            document.getElementById('btn-office').disabled = (state.money < state.officeCost);
-            document.getElementById('btn-gacha').disabled = (state.money < state.gachaCost);
+            // 자동 클릭 버튼 처리
+            const autoBtn = document.getElementById('auto-toggle-btn');
+            if (state.isAutoUnlocked) {
+                autoBtn.style.display = "block";
+                autoBtn.innerText = state.isAutoOn ? "자동 클릭: ON" : "자동 클릭: OFF";
+                autoBtn.className = state.isAutoOn ? "auto-on" : "auto-off";
+            }
         }
 
-        // [UI] 로그 출력
-        function addLog(msg) {
-            const logEl = document.getElementById('log');
-            logEl.innerText = msg;
+        function addLog(msg) { document.getElementById('log').innerText = msg; }
+        function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+        
+        function loadGame() {
+            const saved = localStorage.getItem(SAVE_KEY);
+            if (saved) {
+                state = JSON.parse(saved);
+                if (state.isAutoOn) startAutoClick();
+            }
+            updateUI();
         }
 
-        // 시작 시 데이터 로드
+        function resetGame() {
+            if (confirm("초기화하시겠습니까?")) {
+                localStorage.removeItem(SAVE_KEY);
+                location.reload();
+            }
+        }
+
         window.onload = loadGame;
-
     </script>
 </body>
 </html>
