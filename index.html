@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>부자 키우기 RPG</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .game-container { max-width: 450px; width: 100%; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid #2ecc71; }
+        
+        h1 { color: #27ae60; margin-bottom: 10px; }
+        .money-display { font-size: 2.5rem; font-weight: bold; color: #2c3e50; margin: 15px 0; }
+        .stat-info { font-size: 1rem; color: #7f8c8d; margin-bottom: 20px; }
+
+        /* 메인 클릭 버튼 */
+        #main-click-btn { width: 100%; height: 150px; border: none; border-radius: 15px; background: #2ecc71; color: white; font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 6px #27ae60; margin-bottom: 30px; }
+        #main-click-btn:active { transform: translateY(4px); box-shadow: 0 2px #27ae60; background: #27ae60; }
+
+        /* 상점 & 뽑기 섹션 */
+        .section-title { text-align: left; font-size: 1.1rem; font-weight: bold; margin: 15px 0 10px; border-left: 4px solid #2ecc71; padding-left: 10px; }
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        button.action-btn { padding: 15px 10px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        button.action-btn:hover:not(:disabled) { background: #f9f9f9; border-color: #2ecc71; color: #2ecc71; }
+        button.action-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; }
+        .price { display: block; font-size: 0.8rem; color: #e67e22; font-weight: bold; }
+
+        /* 로그 메시지 */
+        #log { height: 60px; margin-top: 20px; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 0.85rem; color: #666; overflow-y: auto; border: 1px inset #eee; }
+
+        /* 후원 계좌 섹션 */
+        .donation-box { margin-top: 30px; padding: 15px; background: #fff9e6; border-radius: 12px; border: 1px solid #f1c40f; width: 100%; max-width: 450px; box-sizing: border-box; }
+        .donation-title { font-weight: bold; color: #d35400; font-size: 0.95rem; margin-bottom: 5px; }
+        .donation-info { font-size: 0.9rem; color: #444; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>부자 키우기</h1>
+        <div class="money-display">₩ <span id="money">0</span></div>
+        <div class="stat-info">현재 클릭당 숙련도: <span id="power">1</span></div>
+
+        <button id="main-click-btn" onclick="earnMoney()">돈 벌기 (클릭!)</button>
+
+        <div class="section-title">상점 (확정 강화)</div>
+        <div class="grid-buttons">
+            <button class="action-btn" id="btn-upgrade" onclick="buyUpgrade()">
+                클릭 강화 (+1)
+                <span class="price" id="price-upgrade">비용: 100</span>
+            </button>
+            <button class="action-btn" id="btn-office" onclick="buyOffice()">
+                사무실 확장 (+10)
+                <span class="price" id="price-office">비용: 1,500</span>
+            </button>
+        </div>
+
+        <div class="section-title">운 테스트 (랜덤 뽑기)</div>
+        <div class="grid-buttons">
+            <button class="action-btn" id="btn-gacha" onclick="playGacha()">
+                장비 뽑기 (랜덤)
+                <span class="price">비용: 500</span>
+            </button>
+            <button class="action-btn" onclick="location.reload()">게임 초기화</button>
+        </div>
+
+        <div id="log">게임을 시작합니다! 돈을 벌어 부자가 되세요.</div>
+    </div>
+
+    <div class="donation-box">
+        <div class="donation-title">☕ 개발자에게 커피 한 잔 선물하기</div>
+        <div class="donation-info">
+            <strong>KB국민은행</strong> <br>
+            계좌번호: <strong>604490-74-445627</strong> <br>
+            예금주: <strong>임종혁</strong>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            money: 0,
+            power: 1,
+            upgradeCost: 100,
+            officeCost: 1500,
+            gachaCost: 500
+        };
+
+        const logEl = document.getElementById('log');
+
+        // 1. 돈 벌기 기능
+        function earnMoney() {
+            state.money += state.power;
+            updateUI();
+        }
+
+        // 2. 확정 업그레이드 (상점)
+        function buyUpgrade() {
+            if (state.money >= state.upgradeCost) {
+                state.money -= state.upgradeCost;
+                state.power += 1;
+                state.upgradeCost = Math.floor(state.upgradeCost * 1.6);
+                addLog("클릭 강화 성공! 클릭 능력이 1 증가했습니다.");
+                updateUI();
+            }
+        }
+
+        function buyOffice() {
+            if (state.money >= state.officeCost) {
+                state.money -= state.officeCost;
+                state.power += 10;
+                state.officeCost = Math.floor(state.officeCost * 1.8);
+                addLog("사무실 확장 완료! 클릭 능력이 10 증가했습니다.");
+                updateUI();
+            }
+        }
+
+        // 3. 랜덤 뽑기 기능
+        function playGacha() {
+            if (state.money >= state.gachaCost) {
+                state.money -= state.gachaCost;
+                
+                const rand = Math.random() * 100;
+                let gain = 0;
+                let msg = "";
+
+                if (rand > 95) { // 5% 확률
+                    gain = 50;
+                    msg = "★대성공★ 전설의 마우스 획득! (클릭파워 +50)";
+                } else if (rand > 70) { // 25% 확률
+                    gain = 15;
+                    msg = "성공! 게이밍 마우스 획득! (클릭파워 +15)";
+                } else if (rand > 30) { // 40% 확률
+                    gain = 5;
+                    msg = "보통.. 새 마우스 패드 획득. (클릭파워 +5)";
+                } else {
+                    gain = 0;
+                    msg = "꽝! 아무것도 얻지 못했습니다.";
+                }
+
+                state.power += gain;
+                addLog(msg);
+                updateUI();
+            }
+        }
+
+        // 로그 메시지 추가
+        function addLog(msg) {
+            logEl.innerText = msg;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // 화면 업데이트
+        function updateUI() {
+            document.getElementById('money').innerText = state.money.toLocaleString();
+            document.getElementById('power').innerText = state.power.toLocaleString();
+            document.getElementById('price-upgrade').innerText = `비용: ${state.upgradeCost.toLocaleString()}`;
+            document.getElementById('price-office').innerText = `비용: ${state.officeCost.toLocaleString()}`;
+
+            // 버튼 활성화 상태
+            document.getElementById('btn-upgrade').disabled = state.money < state.upgradeCost;
+            document.getElementById('btn-office').disabled = state.money < state.officeCost;
+            document.getElementById('btn-gacha').disabled = state.money < state.gachaCost;
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
